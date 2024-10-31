@@ -3,7 +3,6 @@ using Azure.Storage.Blobs;
 using Azure.Identity;
 using Azure;
 using Azure.Storage.Sas;
-using System.Reflection.Metadata;
 
 namespace CopyBlobBetweenStorage;
 
