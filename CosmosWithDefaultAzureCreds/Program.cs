@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
@@ -7,7 +8,7 @@ namespace CosmosWithDefaultAzureCreds
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
 
@@ -23,7 +24,7 @@ namespace CosmosWithDefaultAzureCreds
             Database cosmodDb = cosmosClient.GetDatabase("px");
             Container cosmosContainer = cosmodDb.GetContainer("tenants");
 
-            cosmosContainer.CreateItemAsync(
+            await cosmosContainer.CreateItemAsync(
                 item: new
                 {
                     id = "test-item-id",
@@ -32,7 +33,7 @@ namespace CosmosWithDefaultAzureCreds
                     partition = "test-item-partion-key", // 👈 This is required
                 },
                 partitionKey: new PartitionKey("test-item-partion-key")
-            ).GetAwaiter().GetResult();
+            );
 
             cosmosClient.Dispose();
         }
