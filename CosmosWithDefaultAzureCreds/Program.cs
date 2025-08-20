@@ -13,7 +13,10 @@ namespace CosmosWithDefaultAzureCreds
             Console.WriteLine("Hello, World!");
 
             // Credential class for testing on a local machine or Azure services
-            TokenCredential credential = new DefaultAzureCredential();
+            TokenCredential credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                TenantId = "azure_tenatid"
+            });
 
             // New instance of CosmosClient class using a connection string
             CosmosClient cosmosClient = new(
@@ -22,17 +25,17 @@ namespace CosmosWithDefaultAzureCreds
             );
 
             Database cosmodDb = cosmosClient.GetDatabase("px");
-            Container cosmosContainer = cosmodDb.GetContainer("tenants");
+            Container cosmosContainer = cosmodDb.GetContainer("organizations");
 
             await cosmosContainer.CreateItemAsync(
                 item: new
                 {
-                    id = "test-item-id",
+                    id = "test-item-id", // 👈 Now partition is this id field, which is required for Cosmos DB items
                     name = "Test Item",
                     description = "This is a test item created using DefaultAzureCredential.",
-                    partition = "test-item-partion-key", // 👈 This is required
+                    //partition = "test-item-partion-key", // 👈 This is required
                 },
-                partitionKey: new PartitionKey("test-item-partion-key")
+                partitionKey: new PartitionKey("test-item-id") //new PartitionKey("test-item-partion-key")
             );
 
             cosmosClient.Dispose();
