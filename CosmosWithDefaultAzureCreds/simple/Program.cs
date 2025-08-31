@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Identity;
+﻿using Azure.Identity;
 using Microsoft.Azure.Cosmos;
+using System;
+using System.Threading.Tasks;
 
 namespace CosmosWithDefaultAzureCreds
 {
@@ -16,7 +15,7 @@ namespace CosmosWithDefaultAzureCreds
             DefaultAzureCredential credential = new(
                 new DefaultAzureCredentialOptions
                 {
-                    TenantId = "tenatid"
+                    TenantId = "tenantid"
                 });
 
             // New instance of CosmosClient class using a connection string
@@ -35,8 +34,9 @@ namespace CosmosWithDefaultAzureCreds
                     name = "Test Item",
                     description = "This is a test item created using DefaultAzureCredential.",
                     //partition = "test-item-partion-key", // 👈 This is required
-                },
-                partitionKey: new PartitionKey("test-item-id") //new PartitionKey("test-item-partion-key")
+                }
+                //,
+                //partitionKey: new PartitionKey("test-item-id") //new PartitionKey("test-item-partion-key")
             );
 
             cosmosClient.Dispose();

@@ -1,4 +1,5 @@
-﻿using di_sample.Extenstions;
+﻿using di_sample.domain.core.Extenstions;
+using di_sample.domain.infrastrcture.Extenstions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
@@ -32,7 +33,9 @@ namespace di_sample
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<App>()
-                .AddCosmosClient();
+                .AddCosmosClient()
+                .AddOrganizationRepository()
+                .AddOrganizationServices();
         }
     }
 }

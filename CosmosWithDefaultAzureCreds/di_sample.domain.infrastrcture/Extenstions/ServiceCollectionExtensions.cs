@@ -1,14 +1,15 @@
 ﻿using Azure.Identity;
-using di_sample.Utils;
+using di_sample.domain.core.Interfaces;
+using di_sample.domain.core.Models;
+using di_sample.domain.infrastrcture.Implementation;
+using di_sample.domain.infrastrcture.Utils;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace di_sample.Extenstions
+namespace di_sample.domain.infrastrcture.Extenstions
 {
     public static class ServiceCollectionExtensions
     {
-
-
         public static IServiceCollection AddCosmosClient(
             this IServiceCollection services)
         {
@@ -25,6 +26,13 @@ namespace di_sample.Extenstions
             });
 
             return services;
+        }
+
+        public static IServiceCollection AddOrganizationRepository(
+            this IServiceCollection services)
+        {
+            return services.AddSingleton<
+                IGenericDbRepository<Organization>, OrganizationCosmosDbRepository>();
         }
     }
 }

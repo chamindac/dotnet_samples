@@ -8,17 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Identity" Version="1.15.0" />
-        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.52.1" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.8" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Interfaces\" />
-      <Folder Include="Implementation\" />
+      <ProjectReference Include="..\di_sample.domain.infrastrcture\di_sample.domain.infrastrcture.csproj" />
     </ItemGroup>
 
 </Project>
