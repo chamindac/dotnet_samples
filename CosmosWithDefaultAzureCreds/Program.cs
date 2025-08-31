@@ -13,10 +13,11 @@ namespace CosmosWithDefaultAzureCreds
             Console.WriteLine("Hello, World!");
 
             // Credential class for testing on a local machine or Azure services
-            TokenCredential credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            {
-                TenantId = "azure_tenatid"
-            });
+            DefaultAzureCredential credential = new(
+                new DefaultAzureCredentialOptions
+                {
+                    TenantId = "tenatid"
+                });
 
             // New instance of CosmosClient class using a connection string
             CosmosClient cosmosClient = new(
