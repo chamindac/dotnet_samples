@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using di_sample.Extenstions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
@@ -30,15 +31,8 @@ namespace di_sample
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<App>();
-            //services
-            //    .AddScoped<ITranscoder, Transcoder>()
-            //    .AddSingleton<IRabbitMQConnectionProvider, RabbitMQConnectionProvider>()
-            //    .AddSingleton<IRabbitMQConsumerProvider, RabbitMQConsumerProvider>()
-            //    .AddSingleton<IRabbitMQMessageHandler, VideoGenerationRequiredHandler>()
-            //    .AddSingleton<IRabbitMQMessageHandler, RegenerateVideoHandler>()
-            //    .AddSingleton<IRabbitMQMessageHandler, ExtractMetadataHandler>()
-            //    .AddHostedService<RabbitMQHostedService>();
+            services.AddTransient<App>()
+                .AddCosmosClient();
         }
     }
 }
