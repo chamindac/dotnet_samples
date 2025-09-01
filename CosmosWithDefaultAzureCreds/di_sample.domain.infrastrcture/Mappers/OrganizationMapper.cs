@@ -1,6 +1,8 @@
 ﻿using di_sample.domain.core.Models;
 using di_sample.domain.infrastrcture.Models.Db;
 using Riok.Mapperly.Abstractions;
+using System.Linq.Expressions;
+using System;
 
 namespace di_sample.domain.infrastrcture.Mappers
 {

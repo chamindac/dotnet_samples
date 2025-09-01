@@ -21,12 +21,20 @@ namespace di_sample
         public async Task RunAsync()
         {
             _logger.LogInformation("Application started");
-            Organization organization = await _organizationOperationService.CreateOrganizationAsync("Test Organization");
+            //Organization organization = await _organizationOperationService.CreateOrganizationAsync("Test Organization");
 
-            _logger.LogInformation("Created organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}", 
-                organization.Id, 
-                organization.Name,
-                organization.CreatedTimeUtc);
+            //_logger.LogInformation("Created organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}",
+            //    organization.Id,
+            //    organization.Name,
+            //    organization.CreatedTimeUtc);
+
+            Organization? organization = await _organizationOperationService.GetOrganizationByNameAsync("Test Organization");
+
+            _logger.LogInformation("Received organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}",
+                organization?.Id,
+                organization?.Name,
+                organization?.CreatedTimeUtc);
+
             _logger.LogInformation("Application finished");
         }
     }

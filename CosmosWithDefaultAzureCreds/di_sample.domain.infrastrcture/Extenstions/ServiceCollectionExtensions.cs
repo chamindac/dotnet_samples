@@ -32,7 +32,7 @@ namespace di_sample.domain.infrastrcture.Extenstions
             this IServiceCollection services)
         {
             return services.AddSingleton<
-                IGenericDbRepository<Organization>, OrganizationCosmosDbRepository>();
+                IOrganizationDbRepository<Organization>, OrganizationCosmosDbRepository>();
         }
     }
 }

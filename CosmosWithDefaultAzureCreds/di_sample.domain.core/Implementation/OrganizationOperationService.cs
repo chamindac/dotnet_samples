@@ -7,10 +7,10 @@ namespace di_sample.domain.core.Implementation
 {
     public class OrganizationOperationService : IOrganizationOperationService
     {
-        private readonly IGenericDbRepository<Organization> _organizationRepository;
+        private readonly IOrganizationDbRepository<Organization> _organizationRepository;
 
         public OrganizationOperationService(
-            IGenericDbRepository<Organization> organizationRepository)
+            IOrganizationDbRepository<Organization> organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
@@ -24,6 +24,11 @@ namespace di_sample.domain.core.Implementation
             };
 
             return _organizationRepository.CreateAsync(organization);
+        }
+
+        public Task<Organization?> GetOrganizationByNameAsync(string name)
+        {
+            return _organizationRepository.GetOrganizationByNameAsync(name);
         }
     }
 }

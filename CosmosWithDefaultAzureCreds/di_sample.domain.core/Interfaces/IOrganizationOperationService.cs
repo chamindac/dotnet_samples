@@ -6,5 +6,7 @@ namespace di_sample.domain.core.Interfaces
     public  interface IOrganizationOperationService
     {
         Task<Organization> CreateOrganizationAsync(string name);
+
+        Task<Organization?> GetOrganizationByNameAsync(string name);
     }
 }

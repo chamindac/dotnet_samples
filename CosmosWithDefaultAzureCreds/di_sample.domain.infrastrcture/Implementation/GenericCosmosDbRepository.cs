@@ -2,7 +2,13 @@
 using di_sample.domain.infrastrcture.Models.Db;
 using Microsoft.Azure.Cosmos;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos.Linq;
+using System.Runtime.CompilerServices;
 
 namespace di_sample.domain.infrastrcture.Implementation
 {
@@ -39,6 +45,41 @@ namespace di_sample.domain.infrastrcture.Implementation
             dbModel = await Container.CreateItemAsync(dbModel);
 
             return ToDomainModel(dbModel);
+        }
+
+        protected async IAsyncEnumerable<TDomainModel> QueryAsync(
+            Expression<Func<TDbModel, bool>> predicate,
+            QueryRequestOptions? requestOptions = null,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            IQueryable<TDbModel> queryable = Container
+                .GetItemLinqQueryable<TDbModel>(
+                    allowSynchronousQueryExecution: false,
+                    requestOptions: requestOptions)
+                .Where(predicate);
+
+            FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
+
+            while (feedIterator.HasMoreResults)
+            {
+                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync(cancellationToken);
+                foreach (TDbModel dbModel in response)
+                {
+                    yield return ToDomainModel(dbModel);
+                }
+            }
+        }
+
+        protected async Task<TDomainModel?> FirstOrDefaultAsync(
+            Expression<Func<TDbModel, bool>> predicate,
+            QueryRequestOptions? requestOptions = null,
+            CancellationToken cancellationToken = default)
+        {
+            await foreach (TDomainModel item in QueryAsync(predicate, requestOptions, cancellationToken))
+            {
+                return item; // immediately return first
+            }
+            return null;
         }
 
         public void Dispose()
