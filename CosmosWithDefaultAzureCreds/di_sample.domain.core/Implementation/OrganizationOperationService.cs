@@ -28,7 +28,7 @@ namespace di_sample.domain.core.Implementation
 
         public Task<Organization?> GetOrganizationByNameAsync(string name)
         {
-            return _organizationRepository.GetOrganizationByNameAsync(name);
+            return _organizationRepository.GetByNameAsync(name);
         }
     }
 }

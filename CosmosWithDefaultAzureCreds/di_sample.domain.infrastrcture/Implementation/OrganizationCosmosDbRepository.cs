@@ -7,15 +7,16 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
+using System.Collections.Generic;
 
 namespace di_sample.domain.infrastrcture.Implementation
 {
-    internal class OrganizationCosmosDbRepository 
-        : GenericCosmosDbRepository<Organization,OrganizationCosmosDbModel>, IOrganizationDbRepository<Organization>
+    internal class OrganizationCosmosDbRepository
+        : GenericCosmosDbRepository<Organization, OrganizationCosmosDbModel>, IOrganizationDbRepository<Organization>
     {
         public OrganizationCosmosDbRepository(
-            CosmosClient cosmosClient) : 
-            base(cosmosClient, 
+            CosmosClient cosmosClient) :
+            base(cosmosClient,
                 "px",
                 "organizations")
         {
@@ -27,12 +28,26 @@ namespace di_sample.domain.infrastrcture.Implementation
         protected override Organization ToDomainModel(OrganizationCosmosDbModel dbModel)
             => dbModel.ToDomainModel();
 
-        public Task<Organization?> GetOrganizationByNameAsync(
+        public Task<Organization?> GetByNameAsync(
             string name,
             CancellationToken cancellationToken = default)
         {
             Expression<Func<OrganizationCosmosDbModel, bool>> predicate = orgDb => orgDb.Name == name;
-            return FirstOrDefaultAsync(predicate, null, cancellationToken);
+            return QueryFirstOrDefaultAsync(predicate, null, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Organization>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            List<Organization> result = [];
+
+            IAsyncEnumerable<Organization> allOrganizations = QueryAllAsync(cancellationToken: cancellationToken);
+
+            await foreach (Organization org in allOrganizations)
+            {
+                result.Add(org);
+            }
+
+            return result;
         }
     }
 }

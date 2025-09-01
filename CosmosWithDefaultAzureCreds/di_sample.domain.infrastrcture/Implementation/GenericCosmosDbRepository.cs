@@ -16,6 +16,8 @@ namespace di_sample.domain.infrastrcture.Implementation
         where TDomainModel : BaseModel
         where TDbModel : BaseCosmosDbModel
     {
+        private const int DefaultMaxItemCount = 100;
+
         private readonly string _databaseName;
         private readonly string _containerName;
 
@@ -50,9 +52,11 @@ namespace di_sample.domain.infrastrcture.Implementation
         protected async IAsyncEnumerable<TDomainModel> QueryAsync(
             Expression<Func<TDbModel, bool>> predicate,
             string? partitionKeyValue = null,
-            int? maxItemCount = null,
+            int maxItemCount = DefaultMaxItemCount,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
+            
+
             QueryRequestOptions queryRequestOptions = new()
             {
                 PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
@@ -78,7 +82,19 @@ namespace di_sample.domain.infrastrcture.Implementation
             }
         }
 
-        protected async Task<TDomainModel?> FirstOrDefaultAsync(
+        protected IAsyncEnumerable<TDomainModel> QueryAllAsync(
+            string? partitionKeyValue = null,
+            int maxItemCount = DefaultMaxItemCount,
+            CancellationToken cancellationToken = default)
+        {
+            // Use a predicate that matches everything
+            Expression<Func<TDbModel, bool>> allPredicate = _ => true;
+
+            // Reuse QueryAsync
+            return QueryAsync(allPredicate, partitionKeyValue, maxItemCount, cancellationToken);
+        }
+
+        protected async Task<TDomainModel?> QueryFirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
             string? partitionKeyValue = null,
             CancellationToken cancellationToken = default)
