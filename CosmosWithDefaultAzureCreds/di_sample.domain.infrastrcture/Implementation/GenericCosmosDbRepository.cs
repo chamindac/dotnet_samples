@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace di_sample.domain.infrastrcture.Implementation
 {
-    internal abstract class GenericCosmosDbRepository<TDomainModel, TDbModel>: IDisposable
+    internal abstract class GenericCosmosDbRepository<TDomainModel, TDbModel> : IDisposable
         where TDomainModel : BaseModel
         where TDbModel : BaseCosmosDbModel
     {
@@ -49,13 +49,21 @@ namespace di_sample.domain.infrastrcture.Implementation
 
         protected async IAsyncEnumerable<TDomainModel> QueryAsync(
             Expression<Func<TDbModel, bool>> predicate,
-            QueryRequestOptions? requestOptions = null,
+            string? partitionKeyValue = null,
+            int? maxItemCount = null,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
+            QueryRequestOptions queryRequestOptions = new()
+            {
+                PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
+                MaxItemCount = maxItemCount
+            };
+
+
             IQueryable<TDbModel> queryable = Container
                 .GetItemLinqQueryable<TDbModel>(
                     allowSynchronousQueryExecution: false,
-                    requestOptions: requestOptions)
+                    requestOptions: queryRequestOptions)
                 .Where(predicate);
 
             FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
@@ -72,14 +80,20 @@ namespace di_sample.domain.infrastrcture.Implementation
 
         protected async Task<TDomainModel?> FirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
-            QueryRequestOptions? requestOptions = null,
+            string? partitionKeyValue = null,
             CancellationToken cancellationToken = default)
         {
-            await foreach (TDomainModel item in QueryAsync(predicate, requestOptions, cancellationToken))
+            // Pass MaxItemCount = 1 to fetch only the first item
+            await foreach (TDomainModel item in QueryAsync(
+                predicate,
+                partitionKeyValue,
+                maxItemCount: 1,
+                cancellationToken))
             {
-                return item; // immediately return first
+                return item; // return immediately
             }
-            return null;
+
+            return null; // no matches
         }
 
         public void Dispose()
