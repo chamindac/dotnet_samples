@@ -28,19 +28,17 @@ namespace di_sample.domain.infrastrcture.Implementation
         protected override Organization ToDomainModel(OrganizationCosmosDbModel dbModel)
             => dbModel.ToDomainModel();
 
-        public Task<Organization?> GetByNameAsync(
-            string name,
-            CancellationToken cancellationToken = default)
+        public Task<Organization?> GetByNameAsync(string name)
         {
             Expression<Func<OrganizationCosmosDbModel, bool>> predicate = orgDb => orgDb.Name == name;
-            return QueryFirstOrDefaultAsync(predicate, null, null, cancellationToken);
+            return QueryFirstOrDefaultAsync(predicate);
         }
 
-        public async Task<IEnumerable<Organization>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Organization>> GetAllAsync()
         {
             List<Organization> result = [];
 
-            IAsyncEnumerable<Organization> allOrganizations = QueryAllAsync(cancellationToken: cancellationToken);
+            IAsyncEnumerable<Organization> allOrganizations = QueryAllAsync();
 
             await foreach (Organization org in allOrganizations)
             {

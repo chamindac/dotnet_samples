@@ -9,10 +9,8 @@ namespace di_sample.domain.core.Interfaces
     {
         Task<TDomainModel> CreateAsync(TDomainModel organization);
 
-        Task<Organization?> GetByNameAsync(
-            string name,
-            CancellationToken cancellationToken = default);
+        Task<Organization?> GetByNameAsync(string name);
 
-        Task<IEnumerable<Organization>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<Organization>> GetAllAsync();
     }
 }

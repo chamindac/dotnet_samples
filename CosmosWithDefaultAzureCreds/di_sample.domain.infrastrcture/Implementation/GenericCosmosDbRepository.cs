@@ -55,8 +55,7 @@ namespace di_sample.domain.infrastrcture.Implementation
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DefaultMaxItemCount,
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+            int maxItemCount = DefaultMaxItemCount)
         {
             QueryRequestOptions queryRequestOptions = new()
             {
@@ -86,7 +85,7 @@ namespace di_sample.domain.infrastrcture.Implementation
 
             while (feedIterator.HasMoreResults)
             {
-                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync(cancellationToken);
+                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
                 foreach (TDbModel dbModel in response)
                 {
                     yield return ToDomainModel(dbModel);
@@ -99,8 +98,7 @@ namespace di_sample.domain.infrastrcture.Implementation
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DefaultMaxItemCount,
-            CancellationToken cancellationToken = default)
+            int maxItemCount = DefaultMaxItemCount)
         {
             // Use a predicate that matches everything
             Expression<Func<TDbModel, bool>> allPredicate = _ => true;
@@ -112,8 +110,7 @@ namespace di_sample.domain.infrastrcture.Implementation
                 orderBy,
                 orderByAscending,
                 partitionKeyValue,
-                maxItemCount, 
-                cancellationToken);
+                maxItemCount);
         }
 
         protected async Task<TDomainModel?> QueryFirstOrDefaultAsync(
@@ -129,8 +126,7 @@ namespace di_sample.domain.infrastrcture.Implementation
                 orderBy: null,
                 orderByAscending: true,
                 partitionKeyValue,
-                maxItemCount: 1,
-                cancellationToken))
+                maxItemCount: 1))
             {
                 return item; // return immediately
             }
