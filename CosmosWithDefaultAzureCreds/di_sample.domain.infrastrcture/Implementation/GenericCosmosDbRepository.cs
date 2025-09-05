@@ -57,31 +57,13 @@ namespace di_sample.domain.infrastrcture.Implementation
             string? partitionKeyValue = null,
             int maxItemCount = DefaultMaxItemCount)
         {
-            QueryRequestOptions queryRequestOptions = new()
-            {
-                PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
-                MaxItemCount = maxItemCount
-            };
-
-            IQueryable<TDbModel> queryable = Container
-                .GetItemLinqQueryable<TDbModel>(
-                    allowSynchronousQueryExecution: false,
-                    requestOptions: queryRequestOptions)
-                .Where(predicate);
-
-            if (orderBy != null)
-            {
-                queryable = orderByAscending
-                    ? queryable.OrderBy(orderBy)
-                    : queryable.OrderByDescending(orderBy);
-            }
-
-            if (selectExpression != null)
-            {
-                queryable = queryable.Select(selectExpression);
-            }
-
-            FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
+            FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
+                                                    predicate, 
+                                                    selectExpression, 
+                                                    orderBy, 
+                                                    orderByAscending, 
+                                                    partitionKeyValue, 
+                                                    maxItemCount);
 
             while (feedIterator.HasMoreResults)
             {
@@ -116,22 +98,62 @@ namespace di_sample.domain.infrastrcture.Implementation
         protected async Task<TDomainModel?> QueryFirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
             Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
-            string? partitionKeyValue = null,
-            CancellationToken cancellationToken = default)
+            Expression<Func<TDbModel, IComparable>>? orderBy = null,
+            bool orderByAscending = true,
+            string? partitionKeyValue = null)
         {
-            // Pass MaxItemCount = 1 to fetch only the first item
-            await foreach (TDomainModel item in QueryAsync(
-                predicate,
-                selectExpression,
-                orderBy: null,
-                orderByAscending: true,
-                partitionKeyValue,
-                maxItemCount: 1))
+            FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
+                                                    predicate, 
+                                                    selectExpression, 
+                                                    orderBy, 
+                                                    orderByAscending, 
+                                                    partitionKeyValue, 
+                                                    1);
+            
+            if (feedIterator.HasMoreResults)
             {
-                return item; // return immediately
+                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
+                TDbModel? dbModel = response.FirstOrDefault();
+                return dbModel != null ? ToDomainModel(dbModel) : null;
             }
 
             return null; // no matches
+        }
+
+        private FeedIterator<TDbModel> BuildFeedIterator(
+            Expression<Func<TDbModel, bool>> predicate, 
+            Expression<Func<TDbModel, TDbModel>>? selectExpression, 
+            Expression<Func<TDbModel, IComparable>>? orderBy, 
+            bool orderByAscending, 
+            string? partitionKeyValue, 
+            int maxItemCount)
+        {
+            QueryRequestOptions queryRequestOptions = new()
+            {
+                PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
+                MaxItemCount = maxItemCount
+            };
+
+            IQueryable<TDbModel> queryable = Container
+                .GetItemLinqQueryable<TDbModel>(
+                    allowSynchronousQueryExecution: false,
+                    requestOptions: queryRequestOptions)
+                .Where(predicate);
+
+            if (orderBy != null)
+            {
+                queryable = orderByAscending
+                    ? queryable.OrderBy(orderBy)
+                    : queryable.OrderByDescending(orderBy);
+            }
+
+            if (selectExpression != null)
+            {
+                queryable = queryable.Select(selectExpression);
+            }
+
+            FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
+            return feedIterator;
         }
 
         public void Dispose()
