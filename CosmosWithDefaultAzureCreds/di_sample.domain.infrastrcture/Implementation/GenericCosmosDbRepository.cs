@@ -108,7 +108,8 @@ namespace di_sample.domain.infrastrcture.Implementation
                                                     orderBy, 
                                                     orderByAscending, 
                                                     partitionKeyValue, 
-                                                    1);
+                                                    1,
+                                                    true);
             
             if (feedIterator.HasMoreResults)
             {
@@ -126,7 +127,8 @@ namespace di_sample.domain.infrastrcture.Implementation
             Expression<Func<TDbModel, IComparable>>? orderBy, 
             bool orderByAscending, 
             string? partitionKeyValue, 
-            int maxItemCount)
+            int maxItemCount,
+            bool takeOne = false)
         {
             QueryRequestOptions queryRequestOptions = new()
             {
@@ -150,6 +152,11 @@ namespace di_sample.domain.infrastrcture.Implementation
             if (selectExpression != null)
             {
                 queryable = queryable.Select(selectExpression);
+            }
+
+            if (takeOne)
+            {
+                queryable = queryable.Take(1); // 👈 enforced at Cosmos SQL level
             }
 
             FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
