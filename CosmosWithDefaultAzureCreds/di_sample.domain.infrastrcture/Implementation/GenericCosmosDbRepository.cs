@@ -51,24 +51,36 @@ namespace di_sample.domain.infrastrcture.Implementation
 
         protected async IAsyncEnumerable<TDomainModel> QueryAsync(
             Expression<Func<TDbModel, bool>> predicate,
+            Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
+            Expression<Func<TDbModel, IComparable>>? orderBy = null,
+            bool orderByAscending = true,
             string? partitionKeyValue = null,
             int maxItemCount = DefaultMaxItemCount,
             [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            
-
             QueryRequestOptions queryRequestOptions = new()
             {
                 PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
                 MaxItemCount = maxItemCount
             };
 
-
             IQueryable<TDbModel> queryable = Container
                 .GetItemLinqQueryable<TDbModel>(
                     allowSynchronousQueryExecution: false,
                     requestOptions: queryRequestOptions)
                 .Where(predicate);
+
+            if (orderBy != null)
+            {
+                queryable = orderByAscending
+                    ? queryable.OrderBy(orderBy)
+                    : queryable.OrderByDescending(orderBy);
+            }
+
+            if (selectExpression != null)
+            {
+                queryable = queryable.Select(selectExpression);
+            }
 
             FeedIterator<TDbModel> feedIterator = queryable.ToFeedIterator();
 
@@ -83,6 +95,9 @@ namespace di_sample.domain.infrastrcture.Implementation
         }
 
         protected IAsyncEnumerable<TDomainModel> QueryAllAsync(
+            Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
+            Expression<Func<TDbModel, IComparable>>? orderBy = null,
+            bool orderByAscending = true,
             string? partitionKeyValue = null,
             int maxItemCount = DefaultMaxItemCount,
             CancellationToken cancellationToken = default)
@@ -91,17 +106,28 @@ namespace di_sample.domain.infrastrcture.Implementation
             Expression<Func<TDbModel, bool>> allPredicate = _ => true;
 
             // Reuse QueryAsync
-            return QueryAsync(allPredicate, partitionKeyValue, maxItemCount, cancellationToken);
+            return QueryAsync(
+                allPredicate,
+                selectExpression,
+                orderBy,
+                orderByAscending,
+                partitionKeyValue,
+                maxItemCount, 
+                cancellationToken);
         }
 
         protected async Task<TDomainModel?> QueryFirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
+            Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
             string? partitionKeyValue = null,
             CancellationToken cancellationToken = default)
         {
             // Pass MaxItemCount = 1 to fetch only the first item
             await foreach (TDomainModel item in QueryAsync(
                 predicate,
+                selectExpression,
+                orderBy: null,
+                orderByAscending: true,
                 partitionKeyValue,
                 maxItemCount: 1,
                 cancellationToken))

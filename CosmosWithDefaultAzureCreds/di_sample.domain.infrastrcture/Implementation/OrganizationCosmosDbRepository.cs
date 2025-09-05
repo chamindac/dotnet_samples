@@ -33,7 +33,7 @@ namespace di_sample.domain.infrastrcture.Implementation
             CancellationToken cancellationToken = default)
         {
             Expression<Func<OrganizationCosmosDbModel, bool>> predicate = orgDb => orgDb.Name == name;
-            return QueryFirstOrDefaultAsync(predicate, null, cancellationToken);
+            return QueryFirstOrDefaultAsync(predicate, null, null, cancellationToken);
         }
 
         public async Task<IEnumerable<Organization>> GetAllAsync(CancellationToken cancellationToken = default)
