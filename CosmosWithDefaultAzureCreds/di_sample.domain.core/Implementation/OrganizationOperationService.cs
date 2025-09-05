@@ -1,6 +1,7 @@
 ﻿using di_sample.domain.core.Interfaces;
 using di_sample.domain.core.Models;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace di_sample.domain.core.Implementation
@@ -24,6 +25,11 @@ namespace di_sample.domain.core.Implementation
             };
 
             return _organizationRepository.CreateAsync(organization);
+        }
+
+        public Task<IEnumerable<Organization>> GetAllAsync()
+        {
+            return _organizationRepository.GetAllAsync();
         }
 
         public Task<Organization?> GetOrganizationByNameAsync(string name)
