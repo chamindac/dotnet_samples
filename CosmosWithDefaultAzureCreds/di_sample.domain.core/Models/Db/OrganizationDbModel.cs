@@ -2,7 +2,7 @@
 
 namespace di_sample.domain.infrastrcture.Models.Db
 {
-    public class OrganizationCosmosDbModel: BaseCosmosDbModel
+    public class OrganizationDbModel: BaseDbModel
     {
         [JsonProperty("name")]
         public required string Name { get; set; }

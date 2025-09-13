@@ -1,24 +1,26 @@
 ﻿using di_sample.domain.core.Interfaces;
-using di_sample.domain.core.Models;
+using di_sample.domain.core.Interfaces.Db;
+using di_sample.domain.infrastrcture.Models.Db;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace di_sample.domain.core.Implementation
 {
     public class OrganizationOperationService : IOrganizationOperationService
     {
-        private readonly IOrganizationDbRepository<Organization> _organizationRepository;
+        private readonly IGenericDbRepository<OrganizationDbModel> _organizationRepository;
 
         public OrganizationOperationService(
-            IOrganizationDbRepository<Organization> organizationRepository)
+            IGenericDbRepository<OrganizationDbModel> organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public Task<Organization> CreateOrganizationAsync(string name)
+        public Task<OrganizationDbModel> CreateOrganizationAsync(string name)
         {
-            Organization organization = new()
+            OrganizationDbModel organization = new()
             {
                 Id = Guid.NewGuid().ToString("N"),
                 Name = name
@@ -27,14 +29,15 @@ namespace di_sample.domain.core.Implementation
             return _organizationRepository.CreateAsync(organization);
         }
 
-        public Task<IEnumerable<Organization>> GetAllAsync()
+        public Task<IEnumerable<OrganizationDbModel>> GetAllAsync()
         {
-            return _organizationRepository.GetAllAsync();
+            return _organizationRepository.QueryAllAsync();
         }
 
-        public Task<Organization?> GetOrganizationByNameAsync(string name)
+        public Task<OrganizationDbModel?> GetOrganizationByNameAsync(string name)
         {
-            return _organizationRepository.GetByNameAsync(name);
+            Expression<Func<OrganizationDbModel, bool>> predicate = orgDb => orgDb.Name == name;
+            return _organizationRepository.QueryFirstOrDefaultAsync(predicate);
         }
     }
 }

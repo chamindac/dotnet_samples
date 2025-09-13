@@ -1,7 +1,7 @@
 ﻿using Azure.Identity;
-using di_sample.domain.core.Interfaces;
-using di_sample.domain.core.Models;
-using di_sample.domain.infrastrcture.Implementation;
+using di_sample.domain.core.Interfaces.Db;
+using di_sample.domain.infrastrcture.Implementation.Db;
+using di_sample.domain.infrastrcture.Models.Db;
 using di_sample.domain.infrastrcture.Utils;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ namespace di_sample.domain.infrastrcture.Extenstions
             this IServiceCollection services)
         {
             return services.AddSingleton<
-                IOrganizationDbRepository<Organization>, OrganizationCosmosDbRepository>();
+                IGenericDbRepository<OrganizationDbModel>, OrganizationDbRepository>();
         }
     }
 }

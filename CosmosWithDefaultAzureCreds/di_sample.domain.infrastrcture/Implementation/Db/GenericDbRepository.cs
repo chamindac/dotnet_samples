@@ -1,23 +1,19 @@
-﻿using di_sample.domain.core.Models;
+﻿using di_sample.domain.core.Constants;
+using di_sample.domain.core.Interfaces.Db;
 using di_sample.domain.infrastrcture.Models.Db;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
-using System.Threading;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Linq;
-using System.Runtime.CompilerServices;
 
-namespace di_sample.domain.infrastrcture.Implementation
+namespace di_sample.domain.infrastrcture.Implementation.Db
 {
-    internal abstract class GenericCosmosDbRepository<TDomainModel, TDbModel> : IDisposable
-        where TDomainModel : BaseModel
-        where TDbModel : BaseCosmosDbModel
+    internal abstract class GenericDbRepository<TDbModel> : IGenericDbRepository<TDbModel>, IDisposable
+        where TDbModel : BaseDbModel
     {
-        private const int DefaultMaxItemCount = 100;
-
         private readonly string _databaseName;
         private readonly string _containerName;
 
@@ -27,7 +23,7 @@ namespace di_sample.domain.infrastrcture.Implementation
 
         protected Container Container => CosmosClient.GetContainer(_databaseName, _containerName);
 
-        protected GenericCosmosDbRepository(
+        protected GenericDbRepository(
             CosmosClient cosmosClient,
             string databaseName,
             string containerName)
@@ -37,50 +33,50 @@ namespace di_sample.domain.infrastrcture.Implementation
             _containerName = containerName;
         }
 
-        protected abstract TDbModel ToDbModel(TDomainModel domainModel);
-        protected abstract TDomainModel ToDomainModel(TDbModel dbModel);
-
-        public async Task<TDomainModel> CreateAsync(TDomainModel domainModel)
+        
+        public async Task<TDbModel> CreateAsync(TDbModel dbModel)
         {
-            domainModel.CreatedTimeUtc = DateTime.UtcNow;
-            TDbModel dbModel = ToDbModel(domainModel);
+            dbModel.CreatedTimeUtc = DateTime.UtcNow;
             dbModel = await Container.CreateItemAsync(dbModel);
 
-            return ToDomainModel(dbModel);
+            return dbModel;
         }
 
-        protected async IAsyncEnumerable<TDomainModel> QueryAsync(
+        public async Task<IEnumerable<TDbModel>> QueryAsync(
             Expression<Func<TDbModel, bool>> predicate,
             Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DefaultMaxItemCount)
+            int maxItemCount = DbConstants.DefaultMaxItemCount)
         {
-            FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
-                                                    predicate, 
-                                                    selectExpression, 
-                                                    orderBy, 
-                                                    orderByAscending, 
-                                                    partitionKeyValue, 
-                                                    maxItemCount);
+            List<TDbModel> results = [];
 
-            while (feedIterator.HasMoreResults)
-            {
-                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
-                foreach (TDbModel dbModel in response)
+            using (FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
+                                                    predicate,
+                                                    selectExpression,
+                                                    orderBy,
+                                                    orderByAscending,
+                                                    partitionKeyValue,
+                                                    maxItemCount))
+            { 
+
+                while (feedIterator.HasMoreResults)
                 {
-                    yield return ToDomainModel(dbModel);
+                    FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
+                    results.AddRange(response);
                 }
             }
+
+            return results; 
         }
 
-        protected IAsyncEnumerable<TDomainModel> QueryAllAsync(
+        public Task<IEnumerable<TDbModel>> QueryAllAsync(
             Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DefaultMaxItemCount)
+            int maxItemCount = DbConstants.DefaultMaxItemCount)
         {
             // Use a predicate that matches everything
             Expression<Func<TDbModel, bool>> allPredicate = _ => true;
@@ -95,27 +91,28 @@ namespace di_sample.domain.infrastrcture.Implementation
                 maxItemCount);
         }
 
-        protected async Task<TDomainModel?> QueryFirstOrDefaultAsync(
+        public async Task<TDbModel?> QueryFirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
             Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null)
         {
-            FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
-                                                    predicate, 
-                                                    selectExpression, 
-                                                    orderBy, 
-                                                    orderByAscending, 
-                                                    partitionKeyValue, 
+            using (FeedIterator<TDbModel> feedIterator = BuildFeedIterator(
+                                                    predicate,
+                                                    selectExpression,
+                                                    orderBy,
+                                                    orderByAscending,
+                                                    partitionKeyValue,
                                                     1,
-                                                    true);
-            
-            if (feedIterator.HasMoreResults)
+                                                    true))
             {
-                FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
-                TDbModel? dbModel = response.FirstOrDefault();
-                return dbModel != null ? ToDomainModel(dbModel) : null;
+                if (feedIterator.HasMoreResults)
+                {
+                    FeedResponse<TDbModel> response = await feedIterator.ReadNextAsync();
+                    TDbModel? dbModel = response.FirstOrDefault();
+                    return dbModel ?? null;
+                }
             }
 
             return null; // no matches

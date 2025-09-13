@@ -1,5 +1,5 @@
 ﻿using di_sample.domain.core.Interfaces;
-using di_sample.domain.core.Models;
+using di_sample.domain.infrastrcture.Models.Db;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,23 +22,23 @@ namespace di_sample
         public async Task RunAsync()
         {
             _logger.LogInformation("Application started");
-            //Organization organization = await _organizationOperationService.CreateOrganizationAsync("Second Org");
+            //OrganizationDbModel organization = await _organizationOperationService.CreateOrganizationAsync("Third Org");
 
             //_logger.LogInformation("Created organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}",
             //    organization.Id,
             //    organization.Name,
             //    organization.CreatedTimeUtc);
 
-            //Organization? organization = await _organizationOperationService.GetOrganizationByNameAsync("Test Organization");
+            //OrganizationDbModel? organization = await _organizationOperationService.GetOrganizationByNameAsync("Test Organization");
 
             //_logger.LogInformation("Received organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}",
             //    organization?.Id,
             //    organization?.Name,
             //    organization?.CreatedTimeUtc);
 
-            IEnumerable<Organization> organizations = await _organizationOperationService.GetAllAsync();
+            IEnumerable<OrganizationDbModel> organizations = await _organizationOperationService.GetAllAsync();
 
-            foreach (Organization org in organizations)
+            foreach (OrganizationDbModel org in organizations)
             {
                 _logger.LogInformation("Received organization with ID: {OrganizationId}, Name: {OrganizationName}, CreatedTime: {CreatedTime}",
                     org.Id,
