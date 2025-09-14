@@ -1,5 +1,5 @@
 ﻿using di_sample.domain.core.Interfaces;
-using di_sample.domain.infrastrcture.Models.Db;
+using di_sample.domain.core.Models.Db;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;

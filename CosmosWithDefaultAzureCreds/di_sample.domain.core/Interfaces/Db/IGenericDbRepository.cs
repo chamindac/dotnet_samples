@@ -1,5 +1,5 @@
 ﻿using di_sample.domain.core.Constants;
-using di_sample.domain.infrastrcture.Models.Db;
+using di_sample.domain.core.Models.Db;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;

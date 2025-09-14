@@ -1,6 +1,6 @@
 ﻿using di_sample.domain.core.Constants;
 using di_sample.domain.core.Interfaces.Db;
-using di_sample.domain.infrastrcture.Models.Db;
+using di_sample.domain.core.Models.Db;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using System;

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace di_sample.domain.infrastrcture.Models.Db
+namespace di_sample.domain.core.Models.Db
 {
     public class OrganizationDbModel: BaseDbModel
     {

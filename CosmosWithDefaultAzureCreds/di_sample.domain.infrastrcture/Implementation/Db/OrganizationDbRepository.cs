@@ -1,4 +1,4 @@
-﻿using di_sample.domain.infrastrcture.Models.Db;
+﻿using di_sample.domain.core.Models.Db;
 using Microsoft.Azure.Cosmos;
 
 namespace di_sample.domain.infrastrcture.Implementation.Db

@@ -1,7 +1,7 @@
 ﻿using Azure.Identity;
 using di_sample.domain.core.Interfaces.Db;
+using di_sample.domain.core.Models.Db;
 using di_sample.domain.infrastrcture.Implementation.Db;
-using di_sample.domain.infrastrcture.Models.Db;
 using di_sample.domain.infrastrcture.Utils;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace di_sample.domain.infrastrcture.Models.Db
+namespace di_sample.domain.core.Models.Db
 {
     public abstract class BaseDbModel
     {

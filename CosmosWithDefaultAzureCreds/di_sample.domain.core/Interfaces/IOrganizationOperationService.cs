@@ -1,4 +1,4 @@
-﻿using di_sample.domain.infrastrcture.Models.Db;
+﻿using di_sample.domain.core.Models.Db;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
