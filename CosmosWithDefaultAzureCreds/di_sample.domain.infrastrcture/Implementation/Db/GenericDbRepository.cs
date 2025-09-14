@@ -48,7 +48,7 @@ namespace di_sample.domain.infrastrcture.Implementation.Db
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DbConstants.DefaultMaxItemCount)
+            int pageSize = DbConstants.DefaultPageSize)
         {
             List<TDbModel> results = [];
 
@@ -58,7 +58,7 @@ namespace di_sample.domain.infrastrcture.Implementation.Db
                                                     orderBy,
                                                     orderByAscending,
                                                     partitionKeyValue,
-                                                    maxItemCount))
+                                                    pageSize))
             { 
 
                 while (feedIterator.HasMoreResults)
@@ -76,7 +76,7 @@ namespace di_sample.domain.infrastrcture.Implementation.Db
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DbConstants.DefaultMaxItemCount)
+            int pageSize = DbConstants.DefaultPageSize)
         {
             // Use a predicate that matches everything
             Expression<Func<TDbModel, bool>> allPredicate = _ => true;
@@ -88,7 +88,7 @@ namespace di_sample.domain.infrastrcture.Implementation.Db
                 orderBy,
                 orderByAscending,
                 partitionKeyValue,
-                maxItemCount);
+                pageSize);
         }
 
         public async Task<TDbModel?> QueryFirstOrDefaultAsync(
@@ -124,13 +124,13 @@ namespace di_sample.domain.infrastrcture.Implementation.Db
             Expression<Func<TDbModel, IComparable>>? orderBy, 
             bool orderByAscending, 
             string? partitionKeyValue, 
-            int maxItemCount,
+            int pageSize,
             bool takeOne = false)
         {
             QueryRequestOptions queryRequestOptions = new()
             {
                 PartitionKey = string.IsNullOrWhiteSpace(partitionKeyValue) ? null : new PartitionKey(partitionKeyValue),
-                MaxItemCount = maxItemCount
+                MaxItemCount = pageSize
             };
 
             IQueryable<TDbModel> queryable = Container

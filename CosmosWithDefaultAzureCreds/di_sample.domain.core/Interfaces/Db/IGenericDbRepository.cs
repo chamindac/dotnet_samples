@@ -17,14 +17,14 @@ namespace di_sample.domain.core.Interfaces.Db
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DbConstants.DefaultMaxItemCount);
+            int pageSize = DbConstants.DefaultPageSize);
 
         Task<IEnumerable<TDbModel>> QueryAllAsync(
             Expression<Func<TDbModel, TDbModel>>? selectExpression = null,
             Expression<Func<TDbModel, IComparable>>? orderBy = null,
             bool orderByAscending = true,
             string? partitionKeyValue = null,
-            int maxItemCount = DbConstants.DefaultMaxItemCount);
+            int pageSize = DbConstants.DefaultPageSize);
 
         Task<TDbModel?> QueryFirstOrDefaultAsync(
             Expression<Func<TDbModel, bool>> predicate,
