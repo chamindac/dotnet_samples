@@ -10,7 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Azure.Identity" Version="1.15.0" />
         <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.52.1" />
-        <PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />
+        <!--<PackageReference Include="Riok.Mapperly" Version="4.2.1" ExcludeAssets="runtime" PrivateAssets="all" />-->
     </ItemGroup>
 
     <ItemGroup>
